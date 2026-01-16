@@ -1,0 +1,110 @@
+---
+title: "Hands-on Exercise 1"
+author: "Ye Zhili"
+---
+
+# Getting Started
+
+## Install and launching R packages
+
+The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, then they will be launched into R.
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+## Importing the data
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+```
+
+## Plotting a simple bar chart
+
+```{r}
+ggplot(data=exam_data,aes(x=RACE))+geom_bar()
+```
+
+## Dotplot
+
+```{r}
+ggplot(data=exam_data,aes(x=MATHS))+
+  geom_dotplot(binwidth=2.5,         
+               dotsize = 0.5) +      
+  scale_y_continuous(NULL,           
+                     breaks = NULL) 
+```
+
+## histogram
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_histogram() 
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           fill = GENDER)) +
+  geom_histogram(bins=20, 
+                 color="grey30")
+```
+
+## Kernel density estimate
+
+```{r}
+ggplot(data=exam_data,
+aes(x = MATHS)) +
+geom_density()
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS, 
+           colour = GENDER)) +
+  geom_density()
+```
+
+## Boxplot
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS,       
+           x= GENDER)) +    
+  geom_boxplot()            
+```
+
+## Scatter plot
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point()           
+```
+
+## Facet
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS)) +
+  geom_histogram(bins=20) +
+    facet_wrap(~ CLASS)           
+```
+
+## -Box plot of math scores for classes grouped by gender
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= CLASS)) +
+  geom_boxplot() +
+  facet_grid(~ GENDER)       
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= CLASS)) +
+  geom_boxplot() +
+  facet_grid(GENDER ~.)       
+```
