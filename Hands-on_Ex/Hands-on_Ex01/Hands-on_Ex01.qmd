@@ -16,7 +16,7 @@ pacman::p_load(tidyverse)
 ## Importing the data
 
 ```{r}
-exam_data <- read_csv("data/Exam_data.csv")
+exam_data <- read_csv("data/Exam_data.csv",show_col_types = FALSE)
 ```
 
 ## Plotting a simple bar chart
@@ -41,6 +41,14 @@ ggplot(data=exam_data,aes(x=MATHS))+
 ggplot(data=exam_data, 
        aes(x = MATHS)) +
   geom_histogram() 
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS)) +
+  geom_histogram(bins=20,            
+                 color="black",      
+                 fill="light blue")  
 ```
 
 ```{r}
@@ -75,6 +83,49 @@ ggplot(data=exam_data,
   geom_boxplot()            
 ```
 
+Plotting boxplot with means
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= GENDER)) +
+  geom_boxplot() +
+  stat_summary(geom = "point",       
+               fun="mean",         
+               colour ="red",        
+               size=4)                         
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot(notch=TRUE)           
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot() +                  
+  geom_point(position="jitter", 
+             size = 0.5)                  
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_violin()           
+```
+
+```{r}
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_violin(fill="light blue") +
+  geom_boxplot(alpha=0.5)                    
+```
+
 ## Scatter plot
 
 ```{r}
@@ -82,6 +133,15 @@ ggplot(data=exam_data,
        aes(x= MATHS, 
            y=ENGLISH)) +
   geom_point()           
+```
+
+Plotting scatterplot with best fit curve
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x= MATHS, y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(size=0.5)          
 ```
 
 ## Facet
