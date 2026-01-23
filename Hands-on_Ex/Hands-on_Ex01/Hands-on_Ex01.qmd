@@ -168,3 +168,4 @@ ggplot(data=exam_data,
   geom_boxplot() +
   facet_grid(GENDER ~.)       
 ```
+
