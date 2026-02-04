@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: docs
 
 website:
   title: "ISS608-VAA"
@@ -30,6 +31,5 @@ format:
 
 editor: visual
 
-project:
-  type: website
-  output-dir: docs
+
+
