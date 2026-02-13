@@ -1,0 +1,168 @@
+---
+title: "Take-home_Ex01"
+author: "Ye Zhili"
+---
+
+Data Preparation First, import relevant library and the dataset.
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(readr)
+library(ggplot2)
+library(forcats)
+library(readxl)
+raw_data <- read_excel("Upload for elsiver.xlsx")
+```
+
+Second, we need to check if there is missing value in each column.
+
+```{r}
+na_summary <- raw_data %>%
+  summarise(across(everything(), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "NA_Count") %>%
+  mutate(NA_Percent = round(NA_Count / nrow(raw_data) * 100, 1)) %>%
+  arrange(desc(NA_Count))
+print(na_summary, n = 30)
+```
+
+Third,drop columns with high missing rates.Living Conditions(LHO1-4, LCRE, LSAV, LWDA) give me 22%-90% missing value so I will drop this section. Nearly 30% data are missing in PPO1 and PPO2 so I will also drop theses two variables.
+
+```{r}
+df <- raw_data %>% select(-LHO1, -LHO2, -LHO3, -LHO4, -LCRE, -LSAV, -LWDA, -PPO1, -PPO2)
+```
+
+Forth, some variables needed data type conversion for subsequent data analysis. Four variables were primarily converted:
+
+1.  CGEN (Gender): The original data consisted of text "1" and "2" instead of numbers, so it was converted to numeric.
+
+2.  ARO4 (Better living conditions in rural areas): A backtick caused the entire column to become character data. `na_if()` converts empty strings and backticks to NA, and `as.numeric()` converts the remaining "1", "2", and "3" from text to numbers.
+
+3.  ARO2 (Increased Woman roles in their families): One record had a value of 11. Normally, there are only three options: 1, 2, and 3, so this was deleted as an outlier.
+
+4.  TOIN (Other Income): Income cannot be negative, so this was also deleted as an outlier.
+
+```{r}
+df <- df %>%
+  mutate(
+    CGEN = as.numeric(CGEN),
+    ARO4 = as.numeric(na_if(na_if(ARO4, ""), "`"))) %>%
+    filter(ARO2 != 11 | is.na(ARO2)) %>%             
+    filter(TOIN >= 0 | is.na(TOIN)) 
+```
+
+Fifth,remove rows with any NA
+
+```{r}
+df_clean <- df %>% drop_na()
+```
+
+Six,add meaningful labels
+
+```{r}
+df_clean <- df_clean %>%
+  mutate(
+    Province = factor(CPRO, levels = 1:5,
+                      labels = c("Tuyen Quang", "Quang Ninh", "Ha Giang",
+                                 "Yen Bai", "Bac Giang")),
+    Gender = factor(CGEN, levels = 1:2,
+                    labels = c("Male", "Female")),
+    Race = factor(CRAC, levels = 1:2,
+                  labels = c("Kinh", "Minorities")),
+    Career = factor(CJOB, levels = 1:3,
+                    labels = c("Agricultural", "Service & Industrial", "Others")),
+    Quintile = factor(CQUI, levels = 1:5,
+                      labels = c("Top", "Fourth", "Middle", "Second", "Lowest")),
+    Education = factor(FEDU, levels = 0:3,
+                       labels = c("Primary", "Lower Secondary",
+                                  "Upper Secondary", "Others/Higher")),
+    Training = factor(FVTP, levels = 1:2,
+                      labels = c("Short Courses", "Long Courses")),
+    Credit = factor(FCRA, levels = 1:2,
+                    labels = c("Inaccessible", "Accessible")),
+    Technology = factor(FTAP, levels = 1:2,
+                        labels = c("Low", "Adequate")),
+    Income_Group = factor(
+      case_when(CQUI %in% c(1, 2) ~ "High Income",
+                CQUI == 3          ~ "Middle Income",
+                CQUI %in% c(4, 5)  ~ "Low Income"),
+      levels = c("High Income", "Middle Income", "Low Income"))
+  )
+```
+
+Data Analysis and Visualization Research Question 1:Do different provinces differ in ethnic composition & career structure?
+
+::: panel-tabset
+## Ethnicity by Province
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+eth_data <- df_clean %>%
+  count(Province, Race) %>%
+  group_by(Province) %>%
+  mutate(Total = sum(n), Pct = n / Total * 100,
+         Label = paste0(n, "\n(", round(Pct, 1), "%)"))
+
+ggplot(eth_data, aes(x = Province, y = Pct, fill = Race)) +
+  geom_col(position = "stack", width = 0.65) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 3.2, color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("Kinh" = "#2E86AB", "Minorities" = "#E8505B")) +
+  labs(title = "Ethnic Composition by Province",
+       subtitle = "Percentage of Kinh vs Ethnic Minorities among surveyed labourers",
+       x = NULL, y = "Percentage (%)", fill = "Ethnicity") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+## Career by Province
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+career_data <- df_clean %>%
+  count(Province, Career) %>%
+  group_by(Province) %>%
+  mutate(Total = sum(n), Pct = n / Total * 100,
+         Label = ifelse(Pct >= 8, paste0(n, "\n(", round(Pct, 1), "%)"), ""))
+
+ggplot(career_data, aes(x = Province, y = Pct, fill = Career)) +
+  geom_col(position = "stack", width = 0.65) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 3.2, color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Others" = "#9C27B0")) +
+  labs(title = "Career Structure by Province",
+       subtitle = "Distribution of occupational sectors among surveyed labourers",
+       x = NULL, y = "Percentage (%)", fill = "Career") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+## Ethnicity × Career
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+cross_data <- df_clean %>%
+  count(Race, Career) %>%
+  group_by(Race) %>%
+  mutate(Total = sum(n), Pct = n / Total * 100,
+         Label = paste0(n, " (", round(Pct, 1), "%)"))
+
+ggplot(cross_data, aes(x = Race, y = Pct, fill = Career)) +
+  geom_col(position = "dodge", width = 0.7) +
+  geom_text(aes(label = Label), position = position_dodge(width = 0.7),
+            vjust = -0.5, size = 3.2) +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Others" = "#9C27B0")) +
+  labs(title = "Career Structure: Kinh vs Ethnic Minorities",
+       subtitle = "Do ethnic minorities have less access to non-agricultural employment?",
+       x = NULL, y = "Percentage (%)", fill = "Career") +
+  ylim(0, 100) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+:::
