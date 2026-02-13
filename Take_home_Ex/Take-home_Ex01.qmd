@@ -90,11 +90,17 @@ df_clean <- df_clean %>%
   )
 ```
 
-Data Analysis and Visualization Research Question 1:Do different provinces differ in ethnic composition & career structure?
+Data Analysis and Visualization
 
-::: panel-tabset
+Research Question 1: Do different provinces differ in ethnic composition & career structure?
+
+Key Findings:
+
+Question 1 explores the relationship between ethnicity,privince and career.All five regions are agriculturally dominated. In Ha Giang, Bac Giang, and Tuyen Guang, agriculture accounts for over 80% of the economy, far exceeding other industries. Other industries also have a relatively high proportion, exceeding secondary and tertiary industries. Only in Bac Giang and Quang Ninh are the service and industrial sectors relatively high. The Kinh ethnic group has a wide distribution of professionals; almost all minority groups are farmers. 
+
+::: panel-tabset 
+
 ## Ethnicity by Province
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -165,4 +171,225 @@ ggplot(cross_data, aes(x = Race, y = Pct, fill = Career)) +
   theme_minimal(base_size = 13) +
   theme(plot.title = element_text(face = "bold"), legend.position = "top")
 ```
+
 :::
+
+Research Question2: Income distribution, averages, and inequality across provinces
+
+Key Findings:
+
+In terms of income, Yen Bai has the lowest median income, and the income of workers in this province is generally concentrated at a low level. Bac Giang has the largest dispersion, with a large number of high-income individuals. Quang Ninh and Tuyen Quang have relatively similar average incomes.
+
+The left bar represents the percentage of people in Q1, and the right bar represents the percentage of income. It can be seen that the proportion of people engaged in agriculture is higher than the proportion of income in each province. For example, in Bac Giang, 83.5% of the population is engaged in agriculture, but contributes only 76% of the income, while the proportion of people in the non-agricultural sector is lower than the proportion of income. This indicates that the average income of non-agricultural workers is higher.
+
+The income distribution in all provinces is significantly right-skewed, with most workers concentrated in the low-income range, and a small number of people extending the right tail. Yen Bai has the highest and narrowest density peak, indicating that income is highly concentrated in the 20-30M range with small internal differences. Bac Giang has the flattest distribution and the largest income range. Ha Giang's right tail extends to 230M, indicating a smaller number of high-income individuals.
+
+Bac Giang's curve is furthest from the diagonal, indicating the highest degree of income inequality within the province. Yen Bai and Tuyen Quang's curves are closest to the diagonal, indicating a relatively even distribution of income.
+
+::: panel-tabset
+
+## Income by Province
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ggplot(df_clean, aes(x = Province, y = TEIN, fill = Province)) +
+  geom_boxplot(width = 0.5, outlier.shape = NA, alpha = 0.8) +
+  geom_jitter(width = 0.15, alpha = 0.2, size = 1) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Total Income Distribution by Province",
+       subtitle = "Boxplot with individual data points (Mil VND)",
+       x = NULL, y = "Total Income (Mil VND)") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "none")
+```
+
+## Income Composition
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+worker_share <- df_clean %>%
+  count(Province, Career) %>%
+  group_by(Province) %>%
+  mutate(Pct = n / sum(n) * 100) %>%
+  ungroup() %>%
+  select(Province, Career, Pct) %>%
+  mutate(Type = "Workers (%)")
+
+income_share <- df_clean %>%
+  group_by(Province, Career) %>%
+  summarise(Total = sum(TEIN), .groups = "drop") %>%
+  group_by(Province) %>%
+  mutate(Pct = Total / sum(Total) * 100) %>%
+  ungroup() %>%
+  select(Province, Career, Pct) %>%
+  mutate(Type = "Income (%)")
+
+combined <- bind_rows(worker_share, income_share) %>%
+  mutate(Type = factor(Type, levels = c("Workers (%)", "Income (%)")),
+         Label = ifelse(Pct >= 6, paste0(round(Pct, 1), "%"), ""))
+
+ggplot(combined, aes(x = Type, y = Pct, fill = Career)) +
+  geom_col(position = "stack", width = 0.7) +
+  geom_text(aes(label = Label),
+            position = position_stack(vjust = 0.5),
+            size = 2.8, color = "white", fontface = "bold") +
+  facet_wrap(~Province, nrow = 1) +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Others" = "#9C27B0")) +
+  labs(title = "Workers vs Income Contribution by Career Sector",
+       subtitle = "Comparing workforce share with income share across provinces",
+       x = NULL, y = "Percentage (%)", fill = "Career") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(size = 9))
+```
+
+## Income Distribution
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ggplot(df_clean, aes(x = TEIN, fill = Province)) +
+  geom_density(alpha = 0.7) +
+  facet_wrap(~Province, ncol = 1, scales = "free_y") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Total Income Density by Province",
+       subtitle = "Distribution shape comparison (Mil VND)",
+       x = "Total Income (Mil VND)", y = "Density") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "none",
+        strip.text = element_text(face = "bold"))
+
+```
+
+## Lorenz Curves by Province
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+lorenz_data <- df_clean %>%
+  group_by(Province) %>%
+  arrange(TEIN, .by_group = TRUE) %>%
+  mutate(cum_pop = row_number() / n(),
+         cum_income = cumsum(TEIN) / sum(TEIN)) %>%
+  ungroup()
+
+equality <- data.frame(x = c(0, 1), y = c(0, 1))
+
+ggplot(lorenz_data, aes(x = cum_pop, y = cum_income, color = Province)) +
+  geom_line(linewidth = 1) +
+  geom_line(data = equality, aes(x = x, y = y), color = "grey40",
+            linetype = "dashed", linewidth = 0.8, inherit.aes = FALSE) +
+  scale_color_brewer(palette = "Set2") +
+  labs(title = "Lorenz Curves by Province",
+       subtitle = "Further from the diagonal = greater inequality",
+       x = "Cumulative Share of Population",
+       y = "Cumulative Share of Income") +
+  coord_equal() +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "right")
+```
+
+:::
+
+Research Question3: How do education, training, credit, and technology relate to income?
+
+Key Findings:
+
+
+::: panel-tabset
+
+## Education vs Income
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ggplot(df_clean, aes(x = Education, y = TEIN, fill = Education)) +
+  geom_boxplot(width = 0.5, outlier.shape = NA, alpha = 0.8) +
+  geom_jitter(width = 0.15, alpha = 0.25, size = 1) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "red") +
+  scale_fill_brewer(palette = "Blues") +
+  labs(title = "Total Income by Education Level",
+       subtitle = "Red diamond = mean; Higher education → higher income ceiling but wider spread",
+       x = NULL, y = "Total Income (Mil VND)") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "none")
+```
+
+
+## Training, Credit, Technology vs Income
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+binary_data <- df_clean %>%
+  select(TEIN, Training, Credit, Technology) %>%
+  pivot_longer(-TEIN, names_to = "Factor", values_to = "Level") %>%
+  mutate(Factor = factor(Factor, levels = c("Training", "Credit", "Technology")),
+         Group = ifelse(Level %in% c("Short Courses", "Inaccessible", "Low"),
+                        "Lower", "Higher"))
+
+means <- binary_data %>%
+  group_by(Factor, Level) %>%
+  summarise(Mean = round(mean(TEIN), 1), .groups = "drop")
+
+ggplot(binary_data, aes(x = Level, y = TEIN, fill = Group)) +
+  geom_boxplot(width = 0.5, outlier.shape = NA, alpha = 0.8) +
+  geom_jitter(width = 0.15, alpha = 0.15, size = 0.8) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "red") +
+  geom_text(data = means, aes(x = Level, y = Mean, label = paste0("mean=", Mean)),
+            vjust = -1.5, size = 3.2, color = "red", fontface = "bold",
+            inherit.aes = FALSE) +
+  facet_wrap(~Factor, scales = "free_x") +
+  scale_fill_manual(values = c("Lower" = "#a6bddb", "Higher" = "#2b8cbe")) +
+  labs(title = "Total Income by Training, Credit Access, and Technology",
+       subtitle = "Red diamond = mean",
+       x = NULL, y = "Total Income (Mil VND)") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "none",
+        strip.text = element_text(face = "bold"))
+```
+
+## Summary 
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+summary_data <- bind_rows(
+  df_clean %>% group_by(Level = Education) %>%
+    summarise(Mean = mean(TEIN), N = n(), .groups = "drop") %>%
+    mutate(Factor = "Education"),
+  df_clean %>% group_by(Level = Training) %>%
+    summarise(Mean = mean(TEIN), N = n(), .groups = "drop") %>%
+    mutate(Factor = "Training"),
+  df_clean %>% group_by(Level = Credit) %>%
+    summarise(Mean = mean(TEIN), N = n(), .groups = "drop") %>%
+    mutate(Factor = "Credit"),
+  df_clean %>% group_by(Level = Technology) %>%
+    summarise(Mean = mean(TEIN), N = n(), .groups = "drop") %>%
+    mutate(Factor = "Technology")
+) %>%
+  mutate(Factor = factor(Factor, levels = c("Education", "Training", "Credit", "Technology")),
+         Label = paste0(round(Mean, 1), " (n=", N, ")"))
+
+ggplot(summary_data, aes(x = Mean, y = reorder(Level, Mean), color = Factor)) +
+  geom_point(size = 4) +
+  geom_segment(aes(xend = 0, yend = reorder(Level, Mean)), linewidth = 0.8, alpha = 0.6) +
+  geom_text(aes(label = Label), hjust = -0.15, size = 3.2) +
+  facet_grid(Factor ~ ., scales = "free_y", space = "free_y") +
+  scale_color_manual(values = c("Education" = "#2166ac", "Training" = "#1b7837",
+                                 "Credit" = "#e08214", "Technology" = "#b2182b")) +
+  labs(title = "Mean Total Income Across All Four Factors",
+       subtitle = "Lollipop chart comparing average income by factor level",
+       x = "Mean Total Income (Mil VND)", y = NULL) +
+  xlim(0, 110) +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "none",
+        strip.text = element_text(face = "bold"))
+
+```
+
+:::
+
+
