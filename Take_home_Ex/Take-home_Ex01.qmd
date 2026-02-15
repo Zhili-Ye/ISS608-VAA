@@ -1,9 +1,23 @@
 ---
-title: "Take-home_Ex01"
+title: "Beyond the Fields: Income Inequality and Resource Disparities Among Informal Labourers in Vietnam's Northern Mountainous Regions"
 author: "Ye Zhili"
 ---
 
-Data Preparation First, import relevant library and the dataset.
+# **Research Objectives:**
+
+This study uses real questionnaire data to focus on the income issues of informal workers in five mountainous provinces in northern Vietnam (Tuyen Quang, Quang Ninh, Ha Giang, Yen Bai, and Bac Giang). Snowball sampling was used, and the dataset contains 725 valid questionnaires, covering 29 variables including personal characteristics, income, living conditions, and policy attitudes.
+
+This study will analyze the personal characteristics and income status of existing workers in the mountainous areas of northern Vietnam based on these variables, and explore the factors influencing income. It will also examine workers' subjective perceptions of their living conditions.
+
+The ultimate goal is to provide reference and suggestions for researchers and local policymakers to help improve the living conditions of rural informal workers and formulate poverty alleviation policies.
+
+# **Main Observation：**
+
+This study found that informal workers in the mountainous regions of northern Vietnam are low-income and heavily reliant on agriculture, and that education and vocational training are the most effective ways to improve their situation. Workers with higher education or long-term training earn 2-3 times more than other workers, but over 70% have only received primary education, and less than 10% have received long-term training. These resource-scarce areas are extremely unevenly distributed; remote, ethnically concentrated provinces like Yen Bai and Ha Giang are precisely where the most crucial factors for income are lacking. Ethnicity and occupation, rather than gender, are the main contributors to inequality, with ethnic minorities structurally concentrated in agriculture, which offers the lowest returns. Across all income groups and occupational sectors, attitudes toward social development remain generally negative, reflecting a lack of understanding or pessimism about the potential for improvement through targeted investment in education and training infrastructure.
+
+# **Data Preparation** 
+
+First, import relevant library and the dataset.
 
 ```{r}
 library(dplyr)
@@ -12,6 +26,8 @@ library(readr)
 library(ggplot2)
 library(forcats)
 library(readxl)
+library(corrplot)
+
 raw_data <- read_excel("Upload for elsiver.xlsx")
 ```
 
@@ -90,17 +106,17 @@ df_clean <- df_clean %>%
   )
 ```
 
-Data Analysis and Visualization
+# **Data Analysis and Visualization**
 
-Research Question 1: Do different provinces differ in ethnic composition & career structure?
+## Research Question 1: Do different provinces differ in ethnic composition & career structure?
 
-Key Findings:
+### Key Findings:
 
-Question 1 explores the relationship between ethnicity,privince and career.All five regions are agriculturally dominated. In Ha Giang, Bac Giang, and Tuyen Guang, agriculture accounts for over 80% of the economy, far exceeding other industries. Other industries also have a relatively high proportion, exceeding secondary and tertiary industries. Only in Bac Giang and Quang Ninh are the service and industrial sectors relatively high. The Kinh ethnic group has a wide distribution of professionals; almost all minority groups are farmers. 
+Question 1 explores the relationship between ethnicity,privince and career.All five regions are agriculturally dominated. In Ha Giang, Bac Giang, and Tuyen Guang, agriculture accounts for over 80% of the economy, far exceeding other industries. Other industries also have a relatively high proportion, exceeding secondary and tertiary industries. Only in Bac Giang and Quang Ninh are the service and industrial sectors relatively high. The Kinh ethnic group has a wide distribution of professionals; almost all minority groups are farmers.
 
-::: panel-tabset 
+::: panel-tabset
+### Ethnicity by Province
 
-## Ethnicity by Province
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -122,7 +138,8 @@ ggplot(eth_data, aes(x = Province, y = Pct, fill = Race)) +
   theme(plot.title = element_text(face = "bold"), legend.position = "top")
 ```
 
-## Career by Province
+### Career by Province
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -146,7 +163,8 @@ ggplot(career_data, aes(x = Province, y = Pct, fill = Career)) +
   theme(plot.title = element_text(face = "bold"), legend.position = "top")
 ```
 
-## Ethnicity × Career
+### Ethnicity by Career
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -171,12 +189,11 @@ ggplot(cross_data, aes(x = Race, y = Pct, fill = Career)) +
   theme_minimal(base_size = 13) +
   theme(plot.title = element_text(face = "bold"), legend.position = "top")
 ```
-
 :::
 
-Research Question2: Income distribution, averages, and inequality across provinces
+## Research Question2: Income distribution, averages, and inequality across provinces
 
-Key Findings:
+### Key Findings:
 
 In terms of income, Yen Bai has the lowest median income, and the income of workers in this province is generally concentrated at a low level. Bac Giang has the largest dispersion, with a large number of high-income individuals. Quang Ninh and Tuyen Quang have relatively similar average incomes.
 
@@ -187,8 +204,8 @@ The income distribution in all provinces is significantly right-skewed, with mos
 Bac Giang's curve is furthest from the diagonal, indicating the highest degree of income inequality within the province. Yen Bai and Tuyen Quang's curves are closest to the diagonal, indicating a relatively even distribution of income.
 
 ::: panel-tabset
+### Income by Province
 
-## Income by Province
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -203,7 +220,8 @@ ggplot(df_clean, aes(x = Province, y = TEIN, fill = Province)) +
   theme(plot.title = element_text(face = "bold"), legend.position = "none")
 ```
 
-## Income Composition
+### Income Composition
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -247,7 +265,8 @@ ggplot(combined, aes(x = Type, y = Pct, fill = Career)) +
         axis.text.x = element_text(size = 9))
 ```
 
-## Income Distribution
+### Income Distribution
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -265,7 +284,8 @@ ggplot(df_clean, aes(x = TEIN, fill = Province)) +
 
 ```
 
-## Lorenz Curves by Province
+### Lorenz Curves by Province
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -291,17 +311,23 @@ ggplot(lorenz_data, aes(x = cum_pop, y = cum_income, color = Province)) +
   theme_minimal(base_size = 13) +
   theme(plot.title = element_text(face = "bold"), legend.position = "right")
 ```
-
 :::
 
-Research Question3: How do education, training, credit, and technology relate to income?
+## Research Question3: How do education, training, credit, and technology relate to income?
 
-Key Findings:
+### Key Findings:
 
+The first chart clearly shows a step-like upward trend in income related to education level. However, the box also widens with increasing education level, indicating a greater income disparity among those with higher education.
+
+In the second chart, among the three similar factors, Training has the same education level as in the first chart, with longer training periods resulting in higher income. Technology shows relatively small differences, possibly because most people are engaged in agriculture. Credit shows almost no difference, and those who obtain credit even have slightly lower incomes, possibly because the loan recipients are predominantly low-income groups.
+
+Of the four factors, Education and Training have the greatest impact on income, far exceeding the other groups. The inter-group differences in Credit and Technology are small.
+
+Overall, education and vocational training, especially long-term courses are the most critical factors affecting the income of informal workers. Credit access and technology application have a weaker impact, possibly because these resources have not yet been effectively converted into productivity gains.
 
 ::: panel-tabset
+### Education vs Income
 
-## Education vs Income
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -317,8 +343,8 @@ ggplot(df_clean, aes(x = Education, y = TEIN, fill = Education)) +
   theme(plot.title = element_text(face = "bold"), legend.position = "none")
 ```
 
+### Training, Credit, Technology vs Income
 
-## Training, Credit, Technology vs Income
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -351,7 +377,8 @@ ggplot(binary_data, aes(x = Level, y = TEIN, fill = Group)) +
         strip.text = element_text(face = "bold"))
 ```
 
-## Summary 
+### Summary
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show the code"
@@ -389,7 +416,535 @@ ggplot(summary_data, aes(x = Mean, y = reorder(Level, Mean), color = Factor)) +
         strip.text = element_text(face = "bold"))
 
 ```
-
 :::
 
+## Research Question4: Do provinces differ in access to education, training, credit, and technology?
 
+### Key Findings:
+
+Education levels are low across all five provinces, with most people having only a primary school education. Yen Bai is the worst affected, with 84.3% having only a primary school education. Tuyen Quang is relatively better, with nearly 44% reaching Lower Secondary or higher. Higher education resources are extremely scarce in these mountainous regions.
+
+A heatmap reveals the differences across the provinces across three dimensions. Technology is the most widely covered resource, while Long Courses, Training, and Credit are extremely low. Tuyen Quang has the most balanced access to resources. Ha Giang has the lowest Technology access, likely due to its 93% agricultural sector.
+
+Figure 3 clearly shows that all provinces have the highest Technology coverage, while Long Courses and Credit Access are extremely low. Tuyen Quang is highest across all four dimensions, while Yen Bai is weakest in Education and Training. Q3 found that Education and Training are the factors most influencing income, explaining why Yen Bai has the lowest income.
+
+::: panel-tabset
+### Education level by Province
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+edu_data <- df_clean %>%
+  count(Province, Education) %>%
+  group_by(Province) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = ifelse(Pct >= 5, paste0(round(Pct, 1), "%"), ""))
+
+ggplot(edu_data, aes(x = Province, y = Pct, fill = Education)) +
+  geom_col(position = "stack", width = 0.65) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 3, color = "white", fontface = "bold") +
+  scale_fill_brewer(palette = "Blues", direction = 1) +
+  labs(title = "Education Level Distribution by Province",
+       subtitle = "Proportion of labourers at each education level",
+       x = NULL, y = "Percentage (%)", fill = "Education") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+### Training, Credit, Technology by Province
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+binary_summary <- bind_rows(
+  df_clean %>% count(Province, Level = Training) %>%
+    group_by(Province) %>% mutate(Pct = n / sum(n) * 100) %>%
+    filter(Level == "Long Courses") %>% mutate(Factor = "Long Courses\n(Training)"),
+  df_clean %>% count(Province, Level = Credit) %>%
+    group_by(Province) %>% mutate(Pct = n / sum(n) * 100) %>%
+    filter(Level == "Accessible") %>% mutate(Factor = "Accessible\n(Credit)"),
+  df_clean %>% count(Province, Level = Technology) %>%
+    group_by(Province) %>% mutate(Pct = n / sum(n) * 100) %>%
+    filter(Level == "Adequate") %>% mutate(Factor = "Adequate\n(Technology)")
+) %>%
+  ungroup() %>%
+  mutate(Factor = factor(Factor, levels = c("Long Courses\n(Training)",
+                                             "Accessible\n(Credit)",
+                                             "Adequate\n(Technology)")))
+
+ggplot(binary_summary, aes(x = Province, y = Factor, fill = Pct)) +
+  geom_tile(color = "white", linewidth = 1.5) +
+  geom_text(aes(label = paste0(round(Pct, 1), "%\n(n=", n, ")")),
+            size = 3.5, fontface = "bold") +
+  scale_fill_gradient(low = "#deebf7", high = "#2171b5") +
+  labs(title = "Access to Training, Credit, and Technology by Province",
+       subtitle = "Percentage of labourers with higher-level access (darker = higher %)",
+       x = NULL, y = NULL, fill = "% Access") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "right",
+        panel.grid = element_blank())
+```
+
+### Summary
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+resource_score <- df_clean %>%
+  mutate(
+    `Upper Secondary+` = ifelse(FEDU >= 2, 1, 0),
+    `Long Courses`     = ifelse(FVTP == 2, 1, 0),
+    `Credit Access`    = ifelse(FCRA == 2, 1, 0),
+    `Adequate Tech`    = ifelse(FTAP == 2, 1, 0)
+  ) %>%
+  group_by(Province) %>%
+  summarise(
+    `Upper Secondary+` = mean(`Upper Secondary+`) * 100,
+    `Long Courses`     = mean(`Long Courses`) * 100,
+    `Credit Access`    = mean(`Credit Access`) * 100,
+    `Adequate Tech`    = mean(`Adequate Tech`) * 100,
+    .groups = "drop"
+  ) %>%
+  pivot_longer(-Province, names_to = "Resource", values_to = "Pct") %>%
+  mutate(Resource = factor(Resource, levels = c("Upper Secondary+", "Long Courses",
+                                                 "Credit Access", "Adequate Tech")))
+
+ggplot(resource_score, aes(x = Province, y = Pct, fill = Resource)) +
+  geom_col(position = "dodge", width = 0.7) +
+  geom_text(aes(label = paste0(round(Pct, 1), "%")),
+            position = position_dodge(width = 0.7), vjust = -0.5, size = 2.8) +
+  scale_fill_manual(values = c("Upper Secondary+" = "#2166ac", "Long Courses" = "#1b7837",
+                                "Credit Access" = "#e08214", "Adequate Tech" = "#b2182b")) +
+  labs(title = "Provincial Resource Access Comparison",
+       subtitle = "Percentage of labourers with access to each resource",
+       x = NULL, y = "Percentage (%)", fill = NULL) +
+  ylim(0, 85) +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+:::
+
+## Research Question5: What is the correlation between Income, Policy & Assessment Variables
+
+### Key Findings:
+
+Continuous numerical variables from the survey were selected, and hierarchical clustering divided the 12 variables into three groups: income variables (TEIN/TAIN/TSII/TOIN) and attitude variables (ARO/PPO). While there was moderate correlation within these groups, the correlation between income and attitude was generally weak. This suggests that income level does not directly determine workers' views on policies. Q5 and Q6 further validated this finding using group comparisons.
+
+```{r}
+cor_vars <- df_clean %>%
+  select(TEIN, TAIN, TSII, TOIN, PPO3, PPO4, PPO5, ARO1, ARO2, ARO3, ARO4, ARO5)
+
+cor_matrix <- cor(cor_vars, method = "spearman")
+
+corrplot(cor_matrix,
+         method = "ellipse",
+         tl.pos = "lt",
+         tl.col = "black",
+         tl.cex = 0.75,
+         order = "hclust",
+         hclust.method = "ward.D",
+         addrect = 3,
+         rect.col = "black",
+         rect.lwd = 2,
+         col = colorRampPalette(c("#B2182B", "#F4A582", "#FDDBC7", "#FFFFFF",
+                                   "#D1E5F0", "#92C5DE", "#2166AC"))(200),
+         title = "Spearman Correlation: Income, Policy & Assessment",
+         mar = c(0, 0, 2, 0))
+```
+
+## Research Question6: Do income groups differ in policy attitudes?
+
+### Key Findings:
+
+All income groups showed relatively high support for healthcare policies. This was the only variable with a "Strongly Agree" response. PPO4 (Elderly Care) and PPO5 (Urban Jobs) showed very similar distributions across the three income groups, with 70% indicating they did not need the policy, confirming the low correlation between income and policy attitudes in the corrplot. The only difference was that in PPO5 (Obtaining Urban Jobs), the proportion of those selecting "strongly disagree" in the Low Income group was significantly higher than in the High Income group, indicating that the demand for urban employment in the low-income group was far less than that in the high-income group. High-income earners may have more experience in non-agricultural employment and a better understanding of the value of urban employment; low-income earners, having long been engaged in agriculture, lack awareness or confidence in urban employment.
+
+::: panel-tabset
+### Response Distribution by Income
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ppo_labels <- c("PPO3" = "Healthcare", "PPO4" = "Elderly Care", "PPO5" = "Urban Jobs")
+
+ppo_data <- df_clean %>%
+  select(Income_Group, PPO3, PPO4, PPO5) %>%
+  pivot_longer(-Income_Group, names_to = "Policy", values_to = "Response") %>%
+  mutate(Policy = factor(Policy, levels = c("PPO3", "PPO4", "PPO5")),
+         Response = factor(Response))
+
+ppo_pct <- ppo_data %>%
+  count(Income_Group, Policy, Response) %>%
+  group_by(Income_Group, Policy) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = ifelse(Pct >= 8, paste0(round(Pct, 0), "%"), "")) %>%
+  ungroup()
+
+ggplot(ppo_pct, aes(x = Income_Group, y = Pct, fill = Response)) +
+  geom_col(position = "stack", width = 0.7) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 2.8, color = "white", fontface = "bold") +
+  facet_wrap(~Policy, labeller = labeller(Policy = ppo_labels)) +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1) +
+  labs(title = "Policy Attitudes by Income Group",
+       subtitle = "Response distribution across three policy areas",
+       x = NULL, y = "Percentage (%)", fill = "Response") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 25, hjust = 1, size = 9))
+```
+
+### Mean Score Comparison
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ppo_means <- df_clean %>%
+  select(Income_Group, PPO3, PPO4, PPO5) %>%
+  pivot_longer(-Income_Group, names_to = "Policy", values_to = "Score") %>%
+  mutate(Policy_Label = recode(Policy,
+                                "PPO3" = "Healthcare (PPO3)",
+                                "PPO4" = "Elderly Care (PPO4)",
+                                "PPO5" = "Urban Jobs (PPO5)")) %>%
+  group_by(Income_Group, Policy_Label) %>%
+  summarise(Mean = mean(Score), SE = sd(Score) / sqrt(n()), .groups = "drop")
+
+ggplot(ppo_means, aes(x = Income_Group, y = Mean, fill = Income_Group)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2) +
+  geom_text(aes(label = round(Mean, 2)), vjust = -0.8, size = 3.2) +
+  facet_wrap(~Policy_Label) +
+  scale_fill_manual(values = c("High Income" = "#2166ac",
+                                "Middle Income" = "#92c5de",
+                                "Low Income" = "#f4a582")) +
+  labs(title = "Mean Policy Attitude Score by Income Group",
+       subtitle = "Error bars = standard error of mean",
+       x = NULL, y = "Mean Score") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 25, hjust = 1, size = 9))
+```
+:::
+
+## Research Question7: Do income groups differ in self-assessment?
+
+### Key Findings:
+
+Respondents across all five categories overwhelmingly expressed a "Strongly Disagree," with no one selecting "Agree" or "Strongly Agree." Respondents from all five provinces generally had a very negative self-assessment. Regarding retirement responsibility, 95% of those in the Low Income category chose "Strongly Disagree."
+
+Regarding inter-group differences, the low-income group was more concentrated on "Strongly Disagree" across all five categories, while the high-income group was more dispersed, with more people choosing "Disagree" and "Neutral." The mean score for the high-income group was consistently higher than that for the low-income group, indicating that high-income earners have higher satisfaction with their situation.
+
+::: panel-tabset
+### Response Distribution by Income
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+aro_labels <- c("ARO1" = "Women Labour\nin Rural Areas",
+                "ARO2" = "Women Roles\nin Families",
+                "ARO3" = "Elderly\nResponsibility",
+                "ARO4" = "Better Living\nConditions",
+                "ARO5" = "Higher Technique\nof Returnees")
+
+aro_data <- df_clean %>%
+  select(Income_Group, ARO1, ARO2, ARO3, ARO4, ARO5) %>%
+  pivot_longer(-Income_Group, names_to = "Item", values_to = "Response") %>%
+  mutate(Item = factor(Item, levels = c("ARO1", "ARO2", "ARO3", "ARO4", "ARO5")),
+         Response = factor(Response, levels = c(1, 2, 3),
+                           labels = c("Strongly Disagree", "Disagree", "Neutral")))
+
+aro_pct <- aro_data %>%
+  count(Income_Group, Item, Response) %>%
+  group_by(Income_Group, Item) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = ifelse(Pct >= 8, paste0(round(Pct, 0), "%"), "")) %>%
+  ungroup()
+
+ggplot(aro_pct, aes(x = Income_Group, y = Pct, fill = Response)) +
+  geom_col(position = "stack", width = 0.7) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 2.5, color = "white", fontface = "bold") +
+  facet_wrap(~Item, nrow = 1, labeller = labeller(Item = aro_labels)) +
+  scale_fill_manual(values = c("Strongly Disagree" = "#b2182b",
+                                "Disagree" = "#f4a582",
+                                "Neutral" = "#fddbc7")) +
+  labs(title = "Self-Assessment by Income Group",
+       subtitle = "5-point Likert scale (only responses 1-3 observed in data; no Agree/Strongly Agree)",
+       x = NULL, y = "Percentage (%)", fill = "Response") +
+  theme_minimal(base_size = 11) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold", size = 8),
+        axis.text.x = element_text(angle = 25, hjust = 1, size = 8))
+```
+
+### Mean Score Comparison
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+aro_means <- df_clean %>%
+  select(Income_Group, ARO1, ARO2, ARO3, ARO4, ARO5) %>%
+  pivot_longer(-Income_Group, names_to = "Item", values_to = "Score") %>%
+  mutate(Item_Label = recode(Item,
+    "ARO1" = "Women Labour (ARO1)",
+    "ARO2" = "Women Roles (ARO2)",
+    "ARO3" = "Elderly Resp. (ARO3)",
+    "ARO4" = "Living Cond. (ARO4)",
+    "ARO5" = "Returnee Tech (ARO5)")) %>%
+  group_by(Income_Group, Item_Label) %>%
+  summarise(Mean = mean(Score), SE = sd(Score) / sqrt(n()), .groups = "drop")
+
+ggplot(aro_means, aes(x = Income_Group, y = Mean, fill = Income_Group)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2) +
+  geom_text(aes(label = round(Mean, 2)), vjust = -0.8, size = 3) +
+  facet_wrap(~Item_Label, nrow = 1) +
+  scale_fill_manual(values = c("High Income" = "#2166ac",
+                                "Middle Income" = "#92c5de",
+                                "Low Income" = "#f4a582")) +
+  scale_y_continuous(limits = c(0, 5), breaks = 1:5,
+                     labels = c("1\nStr. Disagree", "2\nDisagree",
+                                "3\nNeutral", "4\nAgree", "5\nStr. Agree")) +
+  labs(title = "Mean Self-Assessment Score by Income Group",
+       subtitle = "Error bars = standard error of mean (5-point Likert; no responses above Neutral observed)",
+       x = NULL, y = "Mean Score") +
+  theme_minimal(base_size = 11) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "none",
+        strip.text = element_text(face = "bold", size = 8),
+        axis.text.x = element_text(angle = 25, hjust = 1, size = 8))
+```
+:::
+
+## Research Question 8: Income gap between agricultural and non-agricultural workers and their attitudes toward policies and individuals
+
+## Key Findings:
+
+Non-agricultural income is significantly higher than agricultural income. Others income is higher than Service & Industrial, which in turn is higher than Agricultural income. The median and upper quartile of the non-agricultural sector are also higher than those of agriculture, but the dispersion is also greater. The Service & Industrial sector has a wider range, indicating greater income variability within this sector. While Agricultural has the lowest mean, it has the highest concentration, with most people concentrated in the 20-40 million VND range.
+
+It was also found that income sources for workers in mountainous areas are generally mixed, with very few purely agricultural or purely non-agricultural workers. Agricultural workers' income is not entirely from agriculture; they have an average of 6.1 million in other income and 3.9 million in service/industrial income. The Service & Industrial group is most notable for its high proportion of "other income" at 17.7 million, which, combined with agricultural income of 20.3 million, indicates that these individuals also engage in agricultural activities. The Others group has the highest "other income" and the highest total average income.
+
+Of the three attitudes across different income groups, the Others group is closer to neutral in all three aspects, while the Agricultural group is most concentrated at the Strongly Disagree end. The differences were most pronounced in PPO5: 52% of the Others group rated it as "neutral" or higher, compared to only 31% for Agricultural. ARO5 showed a similar pattern: 41% of Service & Industrial rated it as "neutral," while only 20% rated it as "Agricultural." This suggests that non-agricultural workers have a more positive view of urban employment and skills repatriation.
+
+::: panel-tabset
+### Total Income by Career Sector
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+
+ggplot(df_clean, aes(x = Career, y = TEIN, fill = Career)) +
+  geom_boxplot(width = 0.5, outlier.shape = NA, alpha = 0.8) +
+  geom_jitter(width = 0.15, alpha = 0.2, size = 1) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "red") +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Others" = "#9C27B0")) +
+  labs(title = "Total Income by Career Sector",
+       subtitle = "Red diamond = mean; Agricultural vs Non-agricultural income gap",
+       x = NULL, y = "Total Income (Mil VND)") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "none")
+```
+
+### Average Income Composition by Career Sector
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+income_comp <- df_clean %>%
+  group_by(Career) %>%
+  summarise(Agricultural = mean(TAIN),
+            `Service & Industrial` = mean(TSII),
+            Other = mean(TOIN),
+            N = n(), .groups = "drop") %>%
+  pivot_longer(c(Agricultural, `Service & Industrial`, Other),
+               names_to = "Source", values_to = "Mean_Income") %>%
+  mutate(Source = factor(Source, levels = c("Agricultural", "Service & Industrial", "Other")))
+
+ggplot(income_comp, aes(x = Career, y = Mean_Income, fill = Source)) +
+  geom_col(position = "stack", width = 0.6) +
+  geom_text(aes(label = round(Mean_Income, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3.2, color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Other" = "#9C27B0")) +
+  labs(title = "Average Income Composition by Career Sector",
+       subtitle = "Where does income come from for each career group?",
+       x = NULL, y = "Mean Income (Mil VND)", fill = "Income Source") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+### Attitude Distribution by Career
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+att_labels <- c("PPO5" = "Urban Jobs\n(PPO5)",
+                "ARO4" = "Better Living\nConditions (ARO4)",
+                "ARO5" = "Higher Technique\nof Returnees (ARO5)")
+
+att_data <- df_clean %>%
+  select(Career, PPO5, ARO4, ARO5) %>%
+  pivot_longer(-Career, names_to = "Item", values_to = "Response") %>%
+  mutate(Item = factor(Item, levels = c("PPO5", "ARO4", "ARO5")),
+         Response = factor(Response))
+
+att_pct <- att_data %>%
+  count(Career, Item, Response) %>%
+  group_by(Career, Item) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = ifelse(Pct >= 8, paste0(round(Pct, 0), "%"), "")) %>%
+  ungroup()
+
+ggplot(att_pct, aes(x = Career, y = Pct, fill = Response)) +
+  geom_col(position = "stack", width = 0.7) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 2.8, color = "white", fontface = "bold") +
+  facet_wrap(~Item, labeller = labeller(Item = att_labels)) +
+  scale_fill_brewer(palette = "RdYlBu", direction = -1,
+                    labels = c("1" = "Str. Disagree", "2" = "Disagree",
+                               "3" = "Neutral", "4" = "Agree", "5" = "Str. Agree")) +
+  labs(title = "Policy & Self-Assessment Attitudes by Career Sector",
+       subtitle = "5-point Likert scale responses",
+       x = NULL, y = "Percentage (%)", fill = "Response") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 25, hjust = 1, size = 9))
+```
+:::
+
+## Research Question9：Is there a significant income gap between men and women in rural areas? Do women perceive that they have risen in social status?
+
+### Key Findings:
+
+The first chart shows a very small gender income gap, but men's income is significantly more dispersed, with high-income earners almost exclusively men, while women's income is more concentrated in the 20-50 million range. Although average incomes are similar, income inequality is more severe among men.
+
+The second chart reveals that women are less likely than men to engage in pure agriculture, with more concentrated in Service & Industrial and Others sectors. This indicates greater female participation in non-agricultural economic activities. In terms of income structure, the two genders are also very similar. Agricultural income dominates for both, but women's share in Service & Industrial and Others is slightly higher than men's.
+
+Regarding attitudes on women's issues, both genders generally show a strong disagreement, but women's attitudes on "Women Roles in Families" differ slightly. 24% of women chose "Neutral," higher than the 15% of men. This may suggest that women have a more moderate view of changes in their family roles than men.
+
+::: panel-tabset
+### Total Income by Gender
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ggplot(df_clean, aes(x = Gender, y = TEIN, fill = Gender)) +
+  geom_boxplot(width = 0.4, outlier.shape = NA, alpha = 0.8) +
+  geom_jitter(width = 0.15, alpha = 0.2, size = 1) +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "red") +
+  scale_fill_manual(values = c("Male" = "#4393c3", "Female" = "#d6604d")) +
+  labs(title = "Total Income by Gender",
+       subtitle = "Red diamond = mean",
+       x = NULL, y = "Total Income (Mil VND)") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "none")
+```
+
+### Career Structure by Gender
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+career_gender <- df_clean %>%
+  count(Gender, Career) %>%
+  group_by(Gender) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = paste0(round(Pct, 1), "%"))
+
+ggplot(career_gender, aes(x = Gender, y = Pct, fill = Career)) +
+  geom_col(position = "dodge", width = 0.7) +
+  geom_text(aes(label = Label), position = position_dodge(width = 0.7),
+            vjust = -0.5, size = 3.2) +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Others" = "#9C27B0")) +
+  labs(title = "Career Structure by Gender",
+       subtitle = "Are women more concentrated in agriculture?",
+       x = NULL, y = "Percentage (%)", fill = "Career") +
+  ylim(0, 100) +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+### Income Composition by Gender
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+income_comp <- df_clean %>%
+  group_by(Gender) %>%
+  summarise(Agricultural = mean(TAIN),
+            `Service & Industrial` = mean(TSII),
+            Other = mean(TOIN),
+            N = n(), .groups = "drop") %>%
+  pivot_longer(c(Agricultural, `Service & Industrial`, Other),
+               names_to = "Source", values_to = "Mean_Income") %>%
+  mutate(Source = factor(Source, levels = c("Agricultural", "Service & Industrial", "Other")))
+
+ggplot(income_comp, aes(x = Gender, y = Mean_Income, fill = Source)) +
+  geom_col(position = "stack", width = 0.5) +
+  geom_text(aes(label = round(Mean_Income, 1)),
+            position = position_stack(vjust = 0.5),
+            size = 3.5, color = "white", fontface = "bold") +
+  scale_fill_manual(values = c("Agricultural" = "#4CAF50",
+                                "Service & Industrial" = "#FF9800",
+                                "Other" = "#9C27B0")) +
+  labs(title = "Average Income Composition by Gender",
+       subtitle = "Mean income by source (Mil VND)",
+       x = NULL, y = "Mean Income (Mil VND)", fill = "Income Source") +
+  theme_minimal(base_size = 13) +
+  theme(plot.title = element_text(face = "bold"), legend.position = "top")
+```
+
+### Personal Assessment by Gender
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+att_labels <- c("ARO1" = "Increased Women Labour\nin Rural Areas",
+                "ARO2" = "Increased Women Roles\nin Families")
+
+att_data <- df_clean %>%
+  select(Gender, ARO1, ARO2) %>%
+  pivot_longer(-Gender, names_to = "Item", values_to = "Response") %>%
+  mutate(Item = factor(Item, levels = c("ARO1", "ARO2")),
+         Response = factor(Response, levels = c(1, 2, 3),
+                           labels = c("Strongly Disagree", "Disagree", "Neutral")))
+
+att_pct <- att_data %>%
+  count(Gender, Item, Response) %>%
+  group_by(Gender, Item) %>%
+  mutate(Pct = n / sum(n) * 100,
+         Label = ifelse(Pct >= 6, paste0(round(Pct, 0), "%"), "")) %>%
+  ungroup()
+
+ggplot(att_pct, aes(x = Gender, y = Pct, fill = Response)) +
+  geom_col(position = "stack", width = 0.6) +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5),
+            size = 3.2, color = "white", fontface = "bold") +
+  facet_wrap(~Item, labeller = labeller(Item = att_labels)) +
+  scale_fill_manual(values = c("Strongly Disagree" = "#b2182b",
+                                "Disagree" = "#f4a582",
+                                "Neutral" = "#fddbc7")) +
+  labs(title = "Attitudes on Women Issues by Gender",
+       subtitle = "5-point Likert (only 1-3 observed; 1 = Strongly Disagree)",
+       x = NULL, y = "Percentage (%)", fill = "Response") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        strip.text = element_text(face = "bold"))
+```
+:::
