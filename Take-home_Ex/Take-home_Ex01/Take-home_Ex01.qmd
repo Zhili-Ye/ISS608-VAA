@@ -15,7 +15,7 @@ The ultimate goal is to provide reference and suggestions for researchers and lo
 
 This study found that informal workers in the mountainous regions of northern Vietnam are low-income and heavily reliant on agriculture, and that education and vocational training are the most effective ways to improve their situation. Workers with higher education or long-term training earn 2-3 times more than other workers, but over 70% have only received primary education, and less than 10% have received long-term training. These resource-scarce areas are extremely unevenly distributed; remote, ethnically concentrated provinces like Yen Bai and Ha Giang are precisely where the most crucial factors for income are lacking. Ethnicity and occupation, rather than gender, are the main contributors to inequality, with ethnic minorities structurally concentrated in agriculture, which offers the lowest returns. Across all income groups and occupational sectors, attitudes toward social development remain generally negative, reflecting a lack of understanding or pessimism about the potential for improvement through targeted investment in education and training infrastructure.
 
-# **Data Preparation** 
+# **Data Preparation**
 
 First, import relevant library and the dataset.
 
