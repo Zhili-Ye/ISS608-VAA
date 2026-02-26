@@ -1,7 +1,10 @@
 ---
 title: "Hands-on_Ex07"
 ---
-
+```{r}
+pacman::p_load(scales, viridis, lubridate, ggthemes, gridExtra, readxl, knitr, data.table ,tidyverse)
+library(CGPfunctions)
+```
 
 ```{r}
 attacks <- read_csv("data/eventlog.csv")

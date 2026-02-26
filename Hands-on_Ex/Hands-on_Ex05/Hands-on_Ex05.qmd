@@ -7,7 +7,6 @@ author: "Ye Zhili"
 pacman::p_load(plotly, ggtern, tidyverse)
 ```
 
-
 ```{r}
 #Reading the data into R environment
 pop_data <- read_csv("data/respopagsex2000to2018_tidy.csv") 
@@ -25,6 +24,7 @@ agpop_mutated <- pop_data %>%
   filter(Year == 2018)%>%
   filter(TOTAL > 0)
 ```
+
 ```{r}
 #Building the static ternary plot
 ggtern(data=agpop_mutated,aes(x=YOUNG,y=ACTIVE, z=OLD)) +
@@ -194,6 +194,7 @@ corrplot.mixed(wine.cor,
                diag = "l",
                tl.col = "black")
 ```
+
 ```{r}
 corrplot.mixed(wine.cor, 
                lower = "ellipse", 
@@ -248,6 +249,7 @@ row.names(wh) <- wh$Country
 wh1 <- dplyr::select(wh, c(3, 7:12))
 wh_matrix <- data.matrix(wh)
 ```
+
 ```{r}
 wh_heatmap <- heatmap(wh_matrix,
                       Rowv=NA, Colv=NA)
@@ -301,6 +303,7 @@ dend_expend(wh_d)[[3]]
 wh_d <- dist(normalize(wh_matrix[, -c(1, 2, 4, 5)]), method = "euclidean")
 dend_expend(wh_d)[[3]]
 ```
+
 ```{r}
 heatmaply(normalize(wh_matrix[, -c(1, 2, 4, 5)]),
           dist_method = "euclidean",
@@ -561,6 +564,7 @@ ggplot(data=realis2018_selected,
   geom_treemap() +
   scale_fill_gradient(low = "light blue", high = "blue")
 ```
+
 ```{r}
 ggplot(data=realis2018_selected, 
        aes(area = `Total Unit Sold`,
@@ -590,6 +594,7 @@ ggplot(data=realis2018_selected,
                                 size = 2) +
   geom_treemap_subgroup_border(colour = "gray20")
 ```
+
 ```{r}
 library(devtools)
 library(d3treeR)
@@ -609,4 +614,3 @@ tm <- treemap(realis2018_summarised,
 ```{r}
 d3tree(tm,rootname = "Singapore" )
 ```
-
