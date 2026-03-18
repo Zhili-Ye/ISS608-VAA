@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Team Members",
+    "section": "",
+    "text": "CHENG Ho Wang\n\n\nTEO Cher In\n\n\nYE Zhili"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Team Members",
+    "section": "",
+    "text": "CHENG Ho Wang\n\n\nTEO Cher In\n\n\nYE Zhili"
+  },
+  {
+    "objectID": "Project_Proposal.html#motivation",
+    "href": "Project_Proposal.html#motivation",
+    "title": "Project Proposal",
+    "section": "1. Motivation",
+    "text": "1. Motivation\nThe rise of fintech has generated unprecedented volumes of customer behavioural data. Yet in many organisations, the insights buried within this data remain inaccessible — locked behind technical barriers that prevent non-technical stakeholders from exploring them directly. This creates a gap between the data that exists and the decisions that get made.\nThe COFINFAD Colombian Fintech Financial Analytics Dataset captures the full customer lifecycle of 48,723 customers from a Colombian fintech company across 2023 — spanning demographics, product holdings, app engagement, transaction behaviour, satisfaction scores, and churn risk. This richness makes it ideal for building a multi-faceted visual analytics application.\nFinSight is our proposed R Shiny application that democratises access to these analytics. Rather than delivering a static report, FinSight puts the tools of exploratory analysis, statistical testing, customer segmentation, and predictive modelling directly into the hands of the analyst or business user — interactively, and without requiring programming knowledge."
+  },
+  {
+    "objectID": "Project_Proposal.html#objectives",
+    "href": "Project_Proposal.html#objectives",
+    "title": "Project Proposal",
+    "section": "2. Objectives",
+    "text": "2. Objectives\nThis project aims to build an interactive visual analytics application that enables users to:\n\nExplore the distribution of customer demographics, product adoption, satisfaction, and churn risk through interactive visualisations.\nConfirm statistically whether demographic and behavioural factors significantly influence churn probability and customer lifetime value.\nDiscover hidden customer segments beyond the existing labels using Latent Class Analysis, revealing latent behavioural groupings across product usage, app engagement, and satisfaction.\nPredict which combination of customer features including latent class assignments derived from clustering best identifies customers with high churn probability, and extract actionable decision rules from the tree structure to guide targeted retention strategies."
+  },
+  {
+    "objectID": "Project_Proposal.html#data",
+    "href": "Project_Proposal.html#data",
+    "title": "Project Proposal",
+    "section": "3. Data",
+    "text": "3. Data\nThe dataset used is the COFINFAD — Colombian Fintech Financial Analytics Dataset, published on Mendeley Data (DOI: 10.17632/mhb4zn3258.1) under a CC BY 4.0 licence.\nIt consists of two files:\n\ncustomer_data.csv — 48,723 rows × 54 variables covering customer demographics, product holdings, app engagement, transaction behaviour, satisfaction scores, NPS, and churn probability.\ntransactions_data.csv — detailed transaction-level records for the same customer base.\n\nKey variables of interest include churn_probability, customer_segment, clv_segment, satisfaction_score, nps_score, feature_usage_diversity, avg_tx_value, and product holding flags (savings_account, credit_card, investment_account, etc.).\nThree variables required special handling during preparation: credit_utilization_ratio (37% missing — imputed as 0 for non-credit-card holders), and feature_requests and complaint_topics (free-text fields with 33–50% missing — converted to binary presence flags)."
+  },
+  {
+    "objectID": "Project_Proposal.html#methodology",
+    "href": "Project_Proposal.html#methodology",
+    "title": "Project Proposal",
+    "section": "4. Methodology",
+    "text": "4. Methodology\nThe application is organised into four analytical modules, each corresponding to a tab in the Shiny interface.\n\n4.1 Exploratory Data Analysis (EDA)\nThe EDA module provides univariate and bivariate visualisations of the customer dataset. Users can explore the distribution of churn probability, examine correlations among numeric variables through an interactive heatmap, and decompose the age–churn relationship across income bracket and gender groups using faceted plots. Satisfaction scores are examined across CLV segments and customer tenure to surface patterns that motivate the confirmatory tests in the next module.\n\n\n4.2 Confirmatory Data Analysis (CDA)\nThe CDA module uses formal statistical tests to validate observations from EDA. Pearson correlation tests confirm relationships between age, product count, satisfaction, and churn. One-way and two-way ANOVA tests examine whether income bracket, gender, and CLV segment significantly explain variance in churn probability and satisfaction score. A multiple linear regression model with a coefficient plot quantifies the joint predictive effect of key variables on churn. Users can select variables interactively to build and compare regression models.\n\n\n4.3 Clustering — Latent Class Analysis\nThree R packages were evaluated for the clustering module: poLCA, mclust, and LCAvarsel. poLCA was selected as it is specifically designed for categorical manifest variables, whereas mclust assumes continuous Gaussian distributions unsuitable for binned ordinal data. LCAvarsel adds automated variable selection but introduces unnecessary complexity for this use case.\n\n\n4.4 Decision Tree and Random Forest\nTwo R packages were evaluated for the regression module: rpart and ranger.churn_probability is modeled as a continuous outcome, making this a regression tree analysis. rpart was selected as the primary model for its interpretability: the tree structure allows users to visually trace how splitting rules on variables such as active_products, app_logins_frequency, and satisfaction_score produce churn risk estimates. ranger was included as a benchmark ensemble model, evaluated via R² and RMSE on a held-out test set."
+  },
+  {
+    "objectID": "Project_Proposal.html#prototype-sketches",
+    "href": "Project_Proposal.html#prototype-sketches",
+    "title": "Project Proposal",
+    "section": "5. Prototype Sketches",
+    "text": "5. Prototype Sketches\nThe FinSight Shiny application uses a navbarPage() structure with four tabs. Each tab follows a sidebarLayout() pattern — input controls on the left, interactive outputs on the right.\n\nTab 1 — EDA\nInputs: Variable selector, chart type toggle\nOutputs: Distribution plots, correlation heatmap, faceted churn vs age chart by income and gender, satisfaction trends by CLV and tenure\n\n\nTab 2 — CDA\nInputs: Variable selector for regression, test type selector (correlation / ANOVA / regression)\nOutputs: Correlation test result, ANOVA summary, regression coefficient plot with R²\n  \n\n\nTab 3 — Clustering\nInputs: sliderInput for number of classes (2–7), sliderInput for repetitions (1–5), selectInput for variable to plot, actionButton to run model\nOutputs: BIC / AIC / Entropy metric boxes, two plotlyOutput charts in a tabsetPanel (class on x-axis and variable on x-axis)\n\n\n\nClustering Tab — UI Wireframe\n\n\n\n\nTab 4 — Decision Tree\nInputs: Complexity parameter, max depth, number of trees sliders, actionButton to run\nOutputs: Pruned tree plot (rpart.plot), random forest variable importance chart, side-by-side confusion matrix comparison\n\n\n\nClustering Tab — UI Wireframe"
+  },
+  {
+    "objectID": "Project_Proposal.html#r-packages",
+    "href": "Project_Proposal.html#r-packages",
+    "title": "Project Proposal",
+    "section": "6. R Packages",
+    "text": "6. R Packages\n\n\n\nPackage\nPurpose\n\n\n\n\ntidyverse\nData wrangling and transformation\n\n\nggplot2\nStatic chart construction\n\n\nplotly\nInteractive charts via ggplotly()\n\n\npoLCA\nLatent Class Analysis for clustering\n\n\nrpart\nClassification tree modelling\n\n\nrpart.plot\nDecision tree visualisation\n\n\nranger\nRandom forest modelling\n\n\ncaret\nModel evaluation and confusion matrices\n\n\nggcorrplot\nCorrelation heatmap\n\n\nbroom\nTidy model outputs for coefficient plots\n\n\npatchwork\nComposite plot layout\n\n\nshiny\nWeb application framework\n\n\nDT\nInteractive data tables"
+  },
+  {
+    "objectID": "Project_Proposal.html#project-management",
+    "href": "Project_Proposal.html#project-management",
+    "title": "Project Proposal",
+    "section": "7. Project Management",
+    "text": "7. Project Management\n\nTeam Members and Division of Work\n\n\n\nMember\nModule\nShiny Tab\n\n\n\n\nTeo Cher In\nEDA + CDA\nTab 1 + Tab 2\n\n\nCheng Ho Wang\nClustering (LCA)\nTab 3\n\n\nYe Zhili\nDecision Tree + Random Forest\nTab 4\n\n\n\n\n\nGantt Chart"
+  }
+]

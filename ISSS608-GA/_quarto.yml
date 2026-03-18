@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: docs
+  
+website:
+  title: "ISSS608 - Visual Analytics Project"
+  navbar:
+    left:
+    - text: "Project"
+      menu:
+        - text: "Proposal" 
+          href: "Project_Proposal.qmd"
+ 
+    right:
+      - href: index.qmd
+        text: Home
+      - href: about.qmd 
+        text: About
+
+format:
+  html:
+    theme:
+      - sandstone
+      - brand
+    css: styles.css
+    toc: true
+
+editor: visual
