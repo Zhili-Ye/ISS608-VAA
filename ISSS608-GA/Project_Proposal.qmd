@@ -109,7 +109,7 @@ The FinSight Shiny application uses a `navbarPage()` structure with four tabs. E
 
 ## 7. Project Management
 
-### Team Members and Division of Work
+### Scope of Work
 
 | Description                         | Team Member       |
 |-------------------------------------|-------------------|
